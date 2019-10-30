@@ -1,31 +1,37 @@
-kind: pipeline
-name: default
+---
+clone:
+  git:
+    # https://discourse.drone.io/t/planned-change-to-git-clone-logic/1165
+    image: plugins/git:next
+    pull: true
 
 workspace:
   base: /go
-  path: src/github.com/${DRONE_REPO_OWNER}/${DRONE_REPO_NAME}
+  path: src/github.com/ipedrazas/drone-helm
+  
+  #mongodb-forks/drone-helm
+  #${DRONE_REPO_OWNER}/${DRONE_REPO_NAME}
 
-
-steps:
-  - name: deps
-    image: golang:1.10
-    pull: true
+pipeline:
+  deps:
+    image: golang:1.12
     commands:
+      - pwd
       - go get -u github.com/golang/dep/cmd/dep
-      - dep ensure -update
+      - dep ensure
 
-  - name: test
-    image: golang:1.10
+  test:
+    image: golang:1.12
     commands:
       - go vet
       - go test ./... -cover -coverprofile=coverage.out
 
-  - name: build_linux_amd64
-    image: golang:1.10
+  build_linux_amd64:
+    image: golang:1.12
     environment:
       GOOS: linux
       GOARCH: amd64
-      CGO_ENABLED: 0
+      CGO_ENABLED: "0"
     commands:
       - |
         if test "${DRONE_TAG}" = ""; then
@@ -33,17 +39,11 @@ steps:
         else
           go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/${DRONE_REPO_NAME}
         fi
-  - name: publish_linux_amd64
+  publish_linux_amd64:
     image: plugins/docker
     auto_tag: true
-    settings:
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password
-      dockerfile: Dockerfile
-      repo: quay.io/ipedrazas/drone-helm
-      registry: quay.io
-      
+    secrets: [docker_username, docker_password]
+    registry: quay.io
+    repo: quay.io/mongodb/drone-helm
     when:
-      event: [ tag, push ]
+      event: [tag, push]

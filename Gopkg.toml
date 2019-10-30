@@ -38,6 +38,10 @@ ignored = ["sort"]
   name = "github.com/urfave/cli"
   version = "1.19.1"
 
+[[override]]
+  name = "github.com/russross/blackfriday"
+  version = "1.5.2"
+
 [prune]
   go-tests = true
   unused-packages = true
