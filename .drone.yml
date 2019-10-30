@@ -44,7 +44,6 @@ pipeline:
     repo: quay.io/mongodb/drone-helm
     tags:
       - git-${DRONE_COMMIT_SHA:0:7}
-      - latest
     when:
       event: push
 
