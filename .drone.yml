@@ -8,9 +8,6 @@ clone:
 workspace:
   base: /go
   path: src/github.com/ipedrazas/drone-helm
-  
-  #mongodb-forks/drone-helm
-  #${DRONE_REPO_OWNER}/${DRONE_REPO_NAME}
 
 pipeline:
   deps:
@@ -39,11 +36,25 @@ pipeline:
         else
           go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/${DRONE_REPO_NAME}
         fi
+
   publish_linux_amd64:
     image: plugins/docker
-    auto_tag: true
     secrets: [docker_username, docker_password]
     registry: quay.io
     repo: quay.io/mongodb/drone-helm
+    tags:
+      - git-${DRONE_COMMIT_SHA:0:7}
+      - latest
     when:
-      event: [tag, push]
+      event: push
+
+  publish_linux_amd64_release:
+    image: plugins/docker
+    secrets: [docker_username, docker_password]
+    registry: quay.io
+    repo: quay.io/mongodb/drone-helm
+    tags:
+      - git-${DRONE_COMMIT_SHA:0:7}
+      - ${DRONE_TAG}
+    when:
+      event: tag
