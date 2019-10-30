@@ -1,3 +1,5 @@
+# DISCLAIMER - This is a fork for MongoDB in an effort to version pin this drone plugin to prepare for a Helm V3 release.
+
 # Helm (Kubernetes) plugin for drone.io
 
 [![Build Status](https://cloud.drone.io/api/badges/ipedrazas/drone-helm/status.svg)](https://cloud.drone.io/ipedrazas/drone-helm)
@@ -16,7 +18,7 @@ This plugin allows to deploy a [Helm](https://github.com/kubernetes/helm) chart 
 For the usage information and a listing of the available options please take a look at [the docs](DOCS.md).
 
 
-Run the local image (or replace `drone-helm` with `quay.io/ipedrazas/drone-helm`:
+Run the local image (or replace `drone-helm` with `quay.io/mongodb/drone-helm`:
 
 ```bash
 docker run --rm \
@@ -31,7 +33,7 @@ docker run --rm \
   -e PLUGIN_DEBUG=true \
   -e PLUGIN_DRY_RUN=true \
   -e DRONE_BUILD_EVENT=push \
-  quay.io/ipedrazas/drone-helm
+  quay.io/mongodb/drone-helm
 ```
 
 ### Troubleshooting
@@ -54,6 +56,6 @@ export ACTION=add
 
 This repo is setup in a way that if you enable a personal drone server to build your fork it will
  build and publish your image (makes it easier to test PRs and use the image till the contributions get merged)
- 
+
 * Build local ```DRONE_REPO_OWNER=ipedrazas DRONE_REPO_NAME=drone-helm drone exec```
 * on your server just make sure you have DOCKER_USERNAME, DOCKER_PASSWORD, and DOCKERHUB_REPO set as secrets

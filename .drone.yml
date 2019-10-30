@@ -7,7 +7,7 @@ clone:
 
 workspace:
   base: /go
-  path: src/github.com/ipedrazas/drone-helm
+  path: src/github.com/mongodb-forks/drone-helm
 
 pipeline:
   deps:
