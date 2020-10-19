@@ -1,5 +1,7 @@
 # DISCLAIMER - This is a fork for MongoDB in an effort to version pin this drone plugin to prepare for a Helm V3 release.
 
+# NOTE - This repository is deprecated and will not receive any further updates as development has moved to https://github.com/mongodb-forks/drone-helm3
+
 # Helm (Kubernetes) plugin for drone.io
 
 [![Build Status](https://cloud.drone.io/api/badges/ipedrazas/drone-helm/status.svg)](https://cloud.drone.io/ipedrazas/drone-helm)
