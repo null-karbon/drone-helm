@@ -1,59 +1,63 @@
 ---
-clone:
-  git:
-    # https://discourse.drone.io/t/planned-change-to-git-clone-logic/1165
-    image: plugins/git:next
-    pull: true
+kind: pipeline
+type: kubernetes
+name: default
+
+platform:
+  os: linux
+  arch: amd64
 
 workspace:
   base: /go
-  path: src/github.com/mongodb-forks/drone-helm
+  path: /go/src/github.com/mongodb-forks/drone-helm
 
-pipeline:
-  deps:
+steps:
+  - name: deps
+    pull: if-not-exists
     image: golang:1.12
     commands:
       - pwd
       - go get -u github.com/golang/dep/cmd/dep
       - dep ensure
 
-  test:
+  - name: test
+    pull: if-not-exists
     image: golang:1.12
     commands:
       - go vet
       - go test ./... -cover -coverprofile=coverage.out
 
-  build_linux_amd64:
-    image: golang:1.12
+  - name: publish_linux_amd64
+    pull: if-not-exists
+    image: plugins/docker
+    settings:
+      registry: quay.io
+      repo: quay.io/mongodb/drone-helm
+      tags:
+        - git-${DRONE_COMMIT_SHA:0:7}
     environment:
-      GOOS: linux
-      GOARCH: amd64
-      CGO_ENABLED: "0"
-    commands:
-      - |
-        if test "${DRONE_TAG}" = ""; then
-          go build -v -ldflags "-X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/${DRONE_REPO_NAME}
-        else
-          go build -v -ldflags "-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}" -a -o release/linux/amd64/${DRONE_REPO_NAME}
-        fi
-
-  publish_linux_amd64:
-    image: plugins/docker
-    secrets: [docker_username, docker_password]
-    registry: quay.io
-    repo: quay.io/mongodb/drone-helm
-    tags:
-      - git-${DRONE_COMMIT_SHA:0:7}
+      DOCKER_PASSWORD:
+        from_secret: docker_password
+      DOCKER_USERNAME:
+        from_secret: docker_username
     when:
-      event: push
+      event:
+        - push
 
-  publish_linux_amd64_release:
+  - name: publish_linux_amd64_release
+    pull: if-not-exists
     image: plugins/docker
-    secrets: [docker_username, docker_password]
-    registry: quay.io
-    repo: quay.io/mongodb/drone-helm
-    tags:
-      - git-${DRONE_COMMIT_SHA:0:7}
-      - ${DRONE_TAG}
+    settings:
+      registry: quay.io
+      repo: quay.io/mongodb/drone-helm
+      tags:
+        - git-${DRONE_COMMIT_SHA:0:7}
+        - ${DRONE_TAG}
+    environment:
+      DOCKER_PASSWORD:
+        from_secret: docker_password
+      DOCKER_USERNAME:
+        from_secret: docker_username
     when:
-      event: tag
+      event:
+        - tag
