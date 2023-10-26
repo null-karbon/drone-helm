@@ -1,4 +1,4 @@
-# DISCLAIMER - This is a fork for MongoDB in an effort to version pin this drone plugin to prepare for a Helm V3 release.
+nick
 
 # NOTE - This repository is deprecated and will not receive any further updates as development has moved to https://github.com/mongodb-forks/drone-helm3
 
